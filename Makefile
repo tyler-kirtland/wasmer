@@ -944,3 +944,20 @@ update-graphql-schema:
 
 require-nextest:
 	cargo nextest --version > /dev/null || cargo binstall cargo-nextest --secure || cargo install cargo-nextest
+
+xcframework:
+	rm -rf wasmer.xcframework
+	xcodebuild -create-xcframework \
+		-library target/aarch64-apple-darwin/release/libwasmer.dylib -headers lib/c-api \
+		-library target/aarch64-apple-ios/release/libwasmer.dylib -headers lib/c-api \
+		-library target/aarch64-apple-ios-sim/release/libwasmer.dylib -headers lib/c-api \
+		-output wasmer.xcframework
+
+build-apple:
+	make build-capi CARGO_TARGET=aarch64-apple-darwin
+
+	rustup target add aarch64-apple-ios
+	make build-capi CARGO_TARGET=aarch64-apple-ios
+
+	rustup target add aarch64-apple-ios-sim
+	make build-capi CARGO_TARGET=aarch64-apple-ios-sim
